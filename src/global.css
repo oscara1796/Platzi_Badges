@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css?family=Anton|Lato&display=swap');
+
+
+body{
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
+  background-color: #f4f4f7;
+}
+
+
+h1{
+  font-family: 'Anton',sans-serif;
+}
