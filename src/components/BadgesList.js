@@ -11,10 +11,10 @@ class BadgesList extends React.Component{
         {this.props.badges.map((badge)=>{
           return(
             <li className="list__element" key={badge.id}>
-              <img className="list__element__avatar" src={badge.avatarUrl}  alt="Avatarurl"/>
+              <img className="list__element__avatar" src={badge.image}  alt="Avatarurl"/>
               <div>
-                <p>{badge.firstName} {badge.lastName}</p>
-                <a href="/"><img src={facebook_logo} alt="facebook_logo" />@{badge.twitter}</a>
+                <p>{badge.name} <br/>{badge.species}</p>
+                <a href="/"><img src={facebook_logo} alt="facebook_logo" />@{badge.name}</a>
               </div>
             </li>
           )

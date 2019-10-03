@@ -2,41 +2,84 @@ import React from 'react';
 import {Link}  from 'react-router-dom'
 import '../components/styles/Badges.css';
 import BadgesList from '../components/BadgesList';
-import confLogo from '../images/confLogo.png'
+import confLogo from '../images/confLogo.png';
+import Loader from '../components/Loader.js';
 
 class Badges extends React.Component{
-  state={
-    data:[
-    {
-      "id": "2de30c42-9deb-40fc-a41f-05e62b5939a7",
-      "firstName": "Freda",
-      "lastName": "Grady",
-      "email": "Leann_Berge@gmail.com",
-      "jobTitle": "Legacy Brand Director",
-      "twitter": "FredaGrady22221-7573",
-      "avatarUrl": "https://www.gravatar.com/avatar/f63a9c45aca0e7e7de0782a6b1dff40b?d=identicon"
-    },
-    {
-      "id": "d00d3614-101a-44ca-b6c2-0be075aeed3d",
-      "firstName": "Major",
-      "lastName": "Rodriguez",
-      "email": "Ilene66@hotmail.com",
-      "jobTitle": "Human Research Architect",
-      "twitter": "ajorRodriguez61545",
-      "avatarUrl": "https://www.gravatar.com/avatar/d57a8be8cb9219609905da25d5f3e50a?d=identicon"
-    },
-    {
-      "id": "63c03386-33a2-4512-9ac1-354ad7bec5e9",
-      "firstName": "Daphney",
-      "lastName": "Torphy",
-      "email": "Ron61@hotmail.com",
-      "jobTitle": "National Markets Officer",
-      "twitter": "DaphneyTorphy96105",
-      "avatarUrl": "https://www.gravatar.com/avatar/e74e87d40e55b9ff9791c78892e55cb7?d=identicon"
-    }
-  ]
+  /*En el constructor se inicializa el estado */
+  constructor(props){
+  super(props)
+  console.log('1:ocurre primero constructor')
+  this.state={
+    nextPage:1,
+    loading: true,
+    error: null,
+    data:[]
+};
+}
+
+
+componentDidMount(){
+  // Llamada a api de ricky morty
+  this.fetchCharacters()
+  console.log('3:ocurre tercero componenteDidMount')
+  /*tenemos que agregar esto como atributo del objeto o componente
+  para pasarloa una función clear que limpie la lamada o request
+  para que asi no haya problema si el compoenente se desmonta
+  la función se llama clearTimeout y se llama en componentWillUnmount*/
+  // this.timeoutId = setTimeout(() =>{
+  //   this.setState({
+  //     data:[data]
+  //   })
+  // }, 3000)
+}
+
+fetchCharacters = async () =>{
+  this.setState({loading:true, error:null})
+  try{
+    const response = await fetch(`https://rickandmortyapi.com/api/character/?page=${this.state.nextPage}`);
+    // Sacar los datos a esas respuesta otra función asicnrona
+    const data= await response.json()
+    console.log(data)
+
+    // Los datos los queremos guardar!!
+    this.setState({
+        loading: false,
+        data: this.state.data.concat(data.results),
+        nextPage: this.state.nextPage + 1
+    })
+  }catch(error){
+    this.setState({
+        loading: false,
+        error: error
+    })
   }
+
+}
+
+/*Recibe dos argumentos los props que teniamos antes y el this.state
+que teniamos antes */
+componentDidUpdate(prevProps, prevState){
+  console.log('5:componentDidUpdate()')
+  console.log({
+    prevProps: prevProps, prevState: prevState
+  })
+  console.log({
+    props:
+    this.props,
+    state: this.state})
+}
+
+componentWillUnmount(){
+  console.log("6: componentWillUnmount()")
+  clearTimeout(this.timeoutId)
+}
+
   render(){
+    if (this.state.error) {
+      return `Error: ${this.state.error.message}`
+    }
+    console.log('2/4:Segundo ocurre el render')
     return(
       <React.Fragment>
         <div className="Badges">
@@ -62,6 +105,15 @@ class Badges extends React.Component{
               <BadgesList
               badges={this.state.data}
               />
+            {this.state.loading &&
+              (<div className="loader">
+              <Loader/>
+          </div>)}
+
+
+          {!this.state.loading && (
+            <button onClick={() => this.fetchCharacters()} class="btn btn-primary loader-buton"> Load more </button>
+          )}
             </div>
           </div>
         </div>
