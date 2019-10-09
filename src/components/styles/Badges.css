@@ -17,6 +17,8 @@
 }
 
 
+
+
 .Badges__List{
   width: 100%;
   margin: 0;
@@ -50,7 +52,7 @@
 }
 
 .list__element__avatar{
-  width: 100px;
+  width: 120px;
 }
 
 .list__element a img{

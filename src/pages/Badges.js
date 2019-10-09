@@ -4,6 +4,12 @@ import '../components/styles/Badges.css';
 import BadgesList from '../components/BadgesList';
 import confLogo from '../images/confLogo.png';
 import Loader from '../components/Loader.js';
+import Toogle from '../components/Toogle';
+import PageError from '../components/PageError';
+import Api from '../Api.js'
+
+const API = 'https://us-central1-api-cv-3b8cb.cloudfunctions.net/react'
+const API_RICK = 'https://rickandmortyapi.com/api/character/'
 
 class Badges extends React.Component{
   /*En el constructor se inicializa el estado */
@@ -14,14 +20,77 @@ class Badges extends React.Component{
     nextPage:1,
     loading: true,
     error: null,
-    data:[]
+    data: undefined,
+    esRickAndMorty: false,
+    cambioApi: false
 };
+}
+
+handleRickandmorty = ({target}) =>{
+  console.log(target.checked)
+  this.setState({
+    ...this.state,
+    data: undefined,
+    nextPage:1,
+    esRickAndMorty: target.checked,
+    cambioApi: true,
+  })
+}
+
+fetchCharacters = async () =>{
+  const rick = this.state.esRickAndMorty
+  this.setState({ esRickAndMorty: rick, loading:true, error:null})
+  const rest = rick?API_RICK:API
+  try{
+    const response = await fetch(`${rest}?page=${this.state.nextPage}`);
+    // Sacar los datos a esas respuesta otra función asicnrona
+    let data= await response.json()
+
+    if (this.mounted) {
+      if(rick){
+
+        const dataRick = data.results.map(result =>{
+          let name = result.name.split(' ');
+
+          return({
+            id: result.id,
+            avatarUrl:result.image,
+            firstName: name[0],
+            lastName: name[1],
+            facebook: name[0],
+            jobTitle: result.species
+          })
+        })
+
+        // console.log(data)
+
+        // Los datos los queremos guardar!!
+          data = {data: [].concat(this.state.data || [], dataRick)}
+      }else{
+         data={data: await Api.badges.list()}
+      }
+      data={...data, loading:false, nextPage:this.state.nextPage +1, esRickAndMorty: rick}
+      this.setState(data)
+
+    }
+  }catch(error){
+    this.setState({
+        loading: false,
+        error: error,
+        esRickAndMorty: rick
+    })
+  }
+
 }
 
 
 componentDidMount(){
+
   // Llamada a api de ricky morty
+  this.mounted = true
+  console.log(this.mounted);
   this.fetchCharacters()
+
   console.log('3:ocurre tercero componenteDidMount')
   /*tenemos que agregar esto como atributo del objeto o componente
   para pasarloa una función clear que limpie la lamada o request
@@ -34,52 +103,39 @@ componentDidMount(){
   // }, 3000)
 }
 
-fetchCharacters = async () =>{
-  this.setState({loading:true, error:null})
-  try{
-    const response = await fetch(`https://rickandmortyapi.com/api/character/?page=${this.state.nextPage}`);
-    // Sacar los datos a esas respuesta otra función asicnrona
-    const data= await response.json()
-    console.log(data)
 
-    // Los datos los queremos guardar!!
-    this.setState({
-        loading: false,
-        data: this.state.data.concat(data.results),
-        nextPage: this.state.nextPage + 1
-    })
-  }catch(error){
-    this.setState({
-        loading: false,
-        error: error
-    })
-  }
 
-}
+
 
 /*Recibe dos argumentos los props que teniamos antes y el this.state
 que teniamos antes */
 componentDidUpdate(prevProps, prevState){
-  console.log('5:componentDidUpdate()')
-  console.log({
-    prevProps: prevProps, prevState: prevState
-  })
-  console.log({
-    props:
-    this.props,
-    state: this.state})
+  // console.log('5:componentDidUpdate()')
+  // console.log({
+  //   prevProps: prevProps, prevState: prevState
+  // })
+  // console.log({
+  //   props:
+  //   this.props,
+  //   state: this.state})
+
+  if (this.state.cambioApi) {
+    this.setState({...this.state, cambioApi: false})
+    this.fetchCharacters()
+  }
 }
 
 componentWillUnmount(){
-  console.log("6: componentWillUnmount()")
+  // console.log("6: componentWillUnmount()")
   clearTimeout(this.timeoutId)
+  this.mounted= false
 }
 
   render(){
     if (this.state.error) {
-      return `Error: ${this.state.error.message}`
+      return <PageError error={this.state.error}/>
     }
-    console.log('2/4:Segundo ocurre el render')
+    // console.log('2/4:Segundo ocurre el render')
     return(
       <React.Fragment>
         <div className="Badges">
@@ -95,6 +151,7 @@ componentWillUnmount(){
         <div className="Content__container">
           <div className="Badge__container  ">
             <div className="Badges__buttons ">
+              <Toogle onClick={this.handleRickandmorty} />
               <Link to="/badges/new" className="btn btn-success mt-4 mb-2"> New Badges </Link>
             </div>
           </div>
@@ -102,9 +159,12 @@ componentWillUnmount(){
 
           <div className="Badges__List d-flex justify-content-center">
             <div className="Badges__container">
-              <BadgesList
-              badges={this.state.data}
-              />
+              {this.state.data &&
+                <BadgesList
+                badges={this.state.data}
+                state={this.state.loading}
+                />
+              }
             {this.state.loading &&
               (<div className="loader">
               <Loader/>
@@ -112,7 +172,7 @@ componentWillUnmount(){
 
 
           {!this.state.loading && (
-            <button onClick={() => this.fetchCharacters()} class="btn btn-primary loader-buton"> Load more </button>
+            <button onClick={() => this.fetchCharacters()} className="btn btn-primary loader-buton"> Load more </button>
           )}
             </div>
           </div>
