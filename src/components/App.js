@@ -21,7 +21,7 @@ function App(){
           {/*Tenemos que ponerle exact para que React router*/}
           {/*No se confunda con las rutas ya que el pirncipio de las dos*/}
           {/*Es igual*/}
-          <Route path="/" component={BadgeHome} />
+          <Route exact path="/" component={BadgeHome} />
           <Route exact path="/badges" component={Badges} />
           <Route exact path="/badges/new" component={BadgeNew} />
           <Route component={NotFound} />
