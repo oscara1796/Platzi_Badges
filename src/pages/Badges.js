@@ -90,7 +90,7 @@ componentDidMount(){
   this.mounted = true
   console.log(this.mounted);
   this.fetchCharacters()
-
+  // setInterval(this.fetchCharacters, 5000)
   console.log('3:ocurre tercero componenteDidMount')
   /*tenemos que agregar esto como atributo del objeto o componente
   para pasarloa una función clear que limpie la lamada o request

@@ -31,7 +31,7 @@
   width: 500px;
 }
 
-.list__element{
+.list__element .list__element__link{
   display: flex;
   margin: 10px 0px;
   border:  1px solid gray;
@@ -40,25 +40,30 @@
   border-radius: 10px;
 }
 
-.list__element p{
+ .list__element__link p{
   margin-left: 10px;
   font-size: 16px;
   font-weight: bold;
 }
 
-.list__element img{
+.list__element__link .list__element__avatar{
   border-radius: 50%;
 
+
 }
 
-.list__element__avatar{
-  width: 120px;
-}
 
-.list__element a img{
+
+.list__element .list__element__link img{
   margin-left: 5px;
   width: 25px;
 }
+
+.list__element__avatar{
+  width: 120px !important;
+}
+
+
 
 .Badge__container{
   width: 500px;

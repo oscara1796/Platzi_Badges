@@ -2,13 +2,14 @@ import React from 'react';
 import Badge from '../components/badge'
 import BadgeForm from '../components/BadgeForm'
 import logo from '../images/badgenew-header.svg'
-import '../components/styles/BadgeNew.css';
+import '../components/styles/BadgeEdit.css';
 import Api from '../Api';
+import {Link} from 'react-router-dom'
 import Loader from '../components/Loader.js';
 
-class BadgeNew extends React.Component{
+class BadgeEdit extends React.Component{
   state={
-    loading: false,
+    loading: true,
     error: null,
     form: {
     firstName: '',
@@ -19,6 +20,28 @@ class BadgeNew extends React.Component{
 
   }}
 
+  componentDidMount(){
+    this.fetchData()
+  }
+
+  fetchData = async (e) =>{
+    this.setState({loading: true, error:null, })
+
+
+    try{
+      const data = await Api.badges.read(
+        this.props.match.params.badgeId
+      )
+
+      this.setState({
+        loading: false,
+        form: data
+      })
+    }catch(error){
+      this.setState({loading: false, error:error, })
+    }
+  }
+
   handleSubmit = async e =>{
     this.setState({loading: true, error:null})
     //Tenemos que detener el onSubmit
@@ -28,7 +51,7 @@ class BadgeNew extends React.Component{
     e.preventDefault()
 
     try{
-        await Api.badges.create(this.state.form)
+        await Api.badges.update(this.props.match.params.badgeId, this.state.form)
         this.setState({loading: false})
 
 
@@ -58,7 +81,7 @@ class BadgeNew extends React.Component{
     }
     return(
       <React.Fragment>
-        <div className="BadgeNew__hero">
+        <div className="BadgeEdit__hero">
             <img className="img-fluid" src={logo} alt="logo"/>
         </div>
         <div className="container">
@@ -74,7 +97,7 @@ class BadgeNew extends React.Component{
               />
             </div>
             <div className="col-6">
-                <h1>New Attendant</h1>
+                <h1>Edit Attendant</h1>
               <BadgeForm
               onChange={this.handleChange}
               onSubmit={this.handleSubmit}
@@ -92,4 +115,4 @@ class BadgeNew extends React.Component{
 }
 
 
-export default BadgeNew
+export default BadgeEdit
